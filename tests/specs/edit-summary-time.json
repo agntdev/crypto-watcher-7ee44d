@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Edit morning summary time",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Edit morning summary time"
+            }
+          }
+        ],
+        "send": {
+          "callback": "edit_summary_time"
+        }
+      }
+    ]
+  }
+]
