@@ -1,19 +1,17 @@
 [
   {
-    "name": "Add coin",
+    "name": "Add coin via button",
     "steps": [
       {
+        "send": { "callback": "watchlist:add" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Add a coin to your watchlist"
+              "text": "Which coin do you want to watch? Type the ticker (e.g. BTC, ETH, TON)."
             }
           }
-        ],
-        "send": {
-          "callback": "add_coin"
-        }
+        ]
       }
     ]
   }

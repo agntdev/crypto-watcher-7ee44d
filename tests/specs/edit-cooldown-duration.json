@@ -1,19 +1,17 @@
 [
   {
-    "name": "Edit cooldown duration",
+    "name": "Edit cooldown duration via button",
     "steps": [
       {
+        "send": { "callback": "settings:cooldown" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Edit cooldown duration"
+              "text": "How many seconds between alerts for the same coin? (e.g. 3600 for 1 hour)"
             }
           }
-        ],
-        "send": {
-          "callback": "edit_cooldown_duration"
-        }
+        ]
       }
     ]
   }

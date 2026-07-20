@@ -1,24 +1,39 @@
 import { Composer } from "grammy";
 import type { Ctx } from "../bot.js";
-import { mainMenuKeyboard } from "../toolkit/index.js";
+import { registerMainMenuItem, inlineButton, inlineKeyboard } from "../toolkit/index.js";
+import { addUserInfo } from "../storage.js";
 
-// The /start handler renders the bot's MAIN MENU — the primary way users operate
-// a button-first bot. A feature adds its own button by calling
-// `registerMainMenuItem(...)` in its own `src/handlers/<slug>.ts`; this handler
-// renders whatever is registered (plus a Help button), so you do NOT edit this
-// file to add a feature. Send ONE message — no placeholder line above the menu.
-const composer = new Composer<Ctx>();
+registerMainMenuItem({ label: "➕ Add coin", data: "watchlist:add", order: 20 });
+registerMainMenuItem({ label: "👁 Watchlist", data: "watchlist:show", order: 10 });
+registerMainMenuItem({ label: "💰 Price", data: "price:show", order: 30 });
+registerMainMenuItem({ label: "⚙️ Settings", data: "settings:show", order: 40 });
 
 const WELCOME = "👋 Welcome! Tap a button below to get started.";
 
+const composer = new Composer<Ctx>();
+
 composer.command("start", async (ctx) => {
+  if (ctx.from) {
+    await addUserInfo({
+      userId: ctx.from.id,
+      username: ctx.from.username,
+      firstSeen: Date.now(),
+    });
+  }
   await ctx.reply(WELCOME, { reply_markup: mainMenuKeyboard() });
 });
 
-// "Back to menu" — re-render the main menu in place from any sub-view.
 composer.callbackQuery("menu:main", async (ctx) => {
   await ctx.answerCallbackQuery();
   await ctx.editMessageText(WELCOME, { reply_markup: mainMenuKeyboard() });
 });
+
+function mainMenuKeyboard() {
+  return inlineKeyboard([
+    [inlineButton("➕ Add coin", "watchlist:add"), inlineButton("👁 Watchlist", "watchlist:show")],
+    [inlineButton("💰 Price", "price:show"), inlineButton("⚙️ Settings", "settings:show")],
+    [inlineButton("❓ Help", "menu:help")],
+  ]);
+}
 
 export default composer;

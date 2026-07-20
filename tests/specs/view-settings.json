@@ -1,19 +1,17 @@
 [
   {
-    "name": "View settings",
+    "name": "View settings via button",
     "steps": [
       {
+        "send": { "callback": "settings:show" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "View your settings"
+              "text": "⚙️ Your settings:\n\nQuiet hours: not set\nMorning summary: not set\nCooldown: 60 min"
             }
           }
-        ],
-        "send": {
-          "callback": "view_settings"
-        }
+        ]
       }
     ]
   }

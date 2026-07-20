@@ -1,19 +1,17 @@
 [
   {
-    "name": "Set price threshold",
+    "name": "Set price threshold via button",
     "steps": [
       {
+        "send": { "callback": "settings:show" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Set a price threshold for a coin"
+              "text": "⚙️ Your settings:\n\nQuiet hours: not set\nMorning summary: not set\nCooldown: 60 min"
             }
           }
-        ],
-        "send": {
-          "callback": "set_price_threshold"
-        }
+        ]
       }
     ]
   }

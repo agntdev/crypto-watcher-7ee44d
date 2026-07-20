@@ -1,19 +1,17 @@
 [
   {
-    "name": "/watch",
+    "name": "/watch with no args shows usage",
     "steps": [
       {
+        "send": { "text": "/watch" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Add a coin to your watchlist"
+              "text": "Which coin do you want to watch? Try /watch BTC or /watch BTC 50000."
             }
           }
-        ],
-        "send": {
-          "text": "/watch"
-        }
+        ]
       }
     ]
   }

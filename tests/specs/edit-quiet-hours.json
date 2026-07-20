@@ -1,19 +1,17 @@
 [
   {
-    "name": "Edit quiet hours",
+    "name": "Edit quiet hours via button",
     "steps": [
       {
+        "send": { "callback": "settings:quiet" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Edit quiet hours"
+              "text": "Enter quiet hours as start and end times (e.g. 22:00 07:00):"
             }
           }
-        ],
-        "send": {
-          "callback": "edit_quiet_hours"
-        }
+        ]
       }
     ]
   }

@@ -1,15 +1,47 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { getUserSettings } from "../storage.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-
-const composer = new Composer();
+const composer = new Composer<Ctx>();
 
 composer.command("settings", async (ctx) => {
-  await ctx.reply("View and edit settings");
+  const userId = ctx.from?.id;
+  if (!userId) return;
+  const settings = await getUserSettings(userId);
+  const cd = settings.cooldownDuration;
+  const lines: string[] = ["⚙️ Your settings:\n"];
+  lines.push(`Quiet hours: ${settings.quietHoursStart && settings.quietHoursEnd ? `${settings.quietHoursStart}–${settings.quietHoursEnd}` : "not set"}`);
+  lines.push(`Morning summary: ${settings.summaryTime ?? "not set"}`);
+  lines.push(`Cooldown: ${Math.round(cd / 60)} min`);
+  await ctx.reply(lines.join("\n"), {
+    reply_markup: inlineKeyboard([
+      [inlineButton("🌙 Quiet hours", "settings:quiet")],
+      [inlineButton("☀️ Summary time", "settings:summary")],
+      [inlineButton("⏱ Cooldown", "settings:cooldown")],
+      [inlineButton("⬅️ Back to menu", "menu:main")],
+    ]),
+  });
+});
+
+composer.callbackQuery("settings:show", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const userId = ctx.from?.id;
+  if (!userId) return;
+  const settings = await getUserSettings(userId);
+  const cd = settings.cooldownDuration;
+  const lines: string[] = ["⚙️ Your settings:\n"];
+  lines.push(`Quiet hours: ${settings.quietHoursStart && settings.quietHoursEnd ? `${settings.quietHoursStart}–${settings.quietHoursEnd}` : "not set"}`);
+  lines.push(`Morning summary: ${settings.summaryTime ?? "not set"}`);
+  lines.push(`Cooldown: ${Math.round(cd / 60)} min`);
+  await ctx.editMessageText(lines.join("\n"), {
+    reply_markup: inlineKeyboard([
+      [inlineButton("🌙 Quiet hours", "settings:quiet")],
+      [inlineButton("☀️ Summary time", "settings:summary")],
+      [inlineButton("⏱ Cooldown", "settings:cooldown")],
+      [inlineButton("⬅️ Back to menu", "menu:main")],
+    ]),
+  });
 });
 
 export default composer;

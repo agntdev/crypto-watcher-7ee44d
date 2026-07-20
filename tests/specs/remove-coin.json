@@ -1,19 +1,17 @@
 [
   {
-    "name": "Remove coin",
+    "name": "Remove coin via button",
     "steps": [
       {
+        "send": { "callback": "watchlist:remove_list" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Remove a coin from your watchlist"
+              "text": "Your watchlist is empty."
             }
           }
-        ],
-        "send": {
-          "callback": "remove_coin"
-        }
+        ]
       }
     ]
   }
