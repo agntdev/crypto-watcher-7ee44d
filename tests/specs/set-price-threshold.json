@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Set price threshold",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Set a price threshold for a coin"
+            }
+          }
+        ],
+        "send": {
+          "callback": "set_price_threshold"
+        }
+      }
+    ]
+  }
+]
