@@ -1,0 +1,20 @@
+[
+  {
+    "name": "View settings",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "View your settings"
+            }
+          }
+        ],
+        "send": {
+          "callback": "view_settings"
+        }
+      }
+    ]
+  }
+]
