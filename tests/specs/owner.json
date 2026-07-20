@@ -1,0 +1,20 @@
+[
+  {
+    "name": "/owner",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Owner-only: user count and top alerting coins"
+            }
+          }
+        ],
+        "send": {
+          "text": "/owner"
+        }
+      }
+    ]
+  }
+]
