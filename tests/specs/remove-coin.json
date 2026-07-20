@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Remove coin",
+    "steps": [
+      {
+        "expect": [
+          {
+            "method": "sendMessage",
+            "payload": {
+              "text": "Remove a coin from your watchlist"
+            }
+          }
+        ],
+        "send": {
+          "callback": "remove_coin"
+        }
+      }
+    ]
+  }
+]
