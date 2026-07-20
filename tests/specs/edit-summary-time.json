@@ -1,19 +1,17 @@
 [
   {
-    "name": "Edit morning summary time",
+    "name": "Edit morning summary time via button",
     "steps": [
       {
+        "send": { "callback": "settings:summary" },
         "expect": [
           {
-            "method": "sendMessage",
+            "method": "editMessageText",
             "payload": {
-              "text": "Edit morning summary time"
+              "text": "Enter your morning summary time (e.g. 09:00):"
             }
           }
-        ],
-        "send": {
-          "callback": "edit_summary_time"
-        }
+        ]
       }
     ]
   }

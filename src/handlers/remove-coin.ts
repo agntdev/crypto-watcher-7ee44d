@@ -1,17 +1,32 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { getWatchlist } from "../storage.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Remove coin", data: "remove_coin" }) if the toolkit exposes it.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
-
-composer.callbackQuery("remove_coin", async (ctx) => {
+composer.callbackQuery("watchlist:remove_list", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Remove a coin from your watchlist");
+  const userId = ctx.from?.id;
+  if (!userId) return;
+
+  const watchlist = await getWatchlist(userId);
+  if (watchlist.length === 0) {
+    await ctx.editMessageText(
+      "Your watchlist is empty.",
+      { reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]) },
+    );
+    return;
+  }
+
+  const buttons = watchlist.map((e) => [
+    inlineButton(`🗑 ${e.ticker}`, `watchlist:remove:${e.ticker}`),
+  ]);
+  buttons.push([inlineButton("⬅️ Back to menu", "menu:main")]);
+
+  await ctx.editMessageText("Tap a coin to remove it:", {
+    reply_markup: inlineKeyboard(buttons),
+  });
 });
 
 export default composer;

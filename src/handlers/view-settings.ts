@@ -1,17 +1,32 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { getUserSettings } from "../storage.js";
+import { DEFAULT_SETTINGS } from "../types.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "View settings", data: "view_settings" }) if the toolkit exposes it.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
-
-composer.callbackQuery("view_settings", async (ctx) => {
+composer.callbackQuery("settings:view", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("View your settings");
+  const userId = ctx.from?.id;
+  if (!userId) return;
+
+  const settings = await getUserSettings(userId);
+  const cd = settings.cooldownDuration ?? DEFAULT_SETTINGS.cooldownDuration;
+
+  const lines: string[] = ["⚙️ Your settings:\n"];
+  lines.push(`Quiet hours: ${settings.quietHoursStart && settings.quietHoursEnd ? `${settings.quietHoursStart}–${settings.quietHoursEnd}` : "not set"}`);
+  lines.push(`Morning summary: ${settings.summaryTime ?? "not set"}`);
+  lines.push(`Cooldown: ${Math.round(cd / 60)} min`);
+
+  await ctx.editMessageText(lines.join("\n"), {
+    reply_markup: inlineKeyboard([
+      [inlineButton("🌙 Quiet hours", "settings:quiet")],
+      [inlineButton("☀️ Summary time", "settings:summary")],
+      [inlineButton("⏱ Cooldown", "settings:cooldown")],
+      [inlineButton("⬅️ Back to menu", "menu:main")],
+    ]),
+  });
 });
 
 export default composer;

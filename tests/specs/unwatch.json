@@ -1,19 +1,17 @@
 [
   {
-    "name": "/unwatch",
+    "name": "/unwatch with no args shows usage",
     "steps": [
       {
+        "send": { "text": "/unwatch" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Remove a coin from your watchlist"
+              "text": "Which coin do you want to remove? Try /unwatch BTC."
             }
           }
-        ],
-        "send": {
-          "text": "/unwatch"
-        }
+        ]
       }
     ]
   }

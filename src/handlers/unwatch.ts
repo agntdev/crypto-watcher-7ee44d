@@ -1,15 +1,36 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { removeWatchlistEntry } from "../storage.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-
-const composer = new Composer();
+const composer = new Composer<Ctx>();
 
 composer.command("unwatch", async (ctx) => {
-  await ctx.reply("Remove a coin from your watchlist");
+  const text = ctx.message?.text?.trim() ?? "";
+  const args = text.replace(/^\/unwatch\s*/i, "").trim();
+
+  if (!args) {
+    await ctx.reply("Which coin do you want to remove? Try /unwatch BTC.", {
+      reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]),
+    });
+    return;
+  }
+
+  const ticker = args.split(/\s+/)[0]!.toUpperCase();
+  const userId = ctx.from?.id;
+  if (!userId) return;
+
+  const removed = await removeWatchlistEntry(userId, ticker);
+
+  if (removed) {
+    await ctx.reply(`🗑 Removed ${ticker} from your watchlist.`, {
+      reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]),
+    });
+  } else {
+    await ctx.reply(`${ticker} isn't in your watchlist.`, {
+      reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]),
+    });
+  }
 });
 
 export default composer;

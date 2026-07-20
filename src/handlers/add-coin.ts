@@ -1,17 +1,56 @@
 import { Composer } from "grammy";
+import type { Ctx } from "../bot.js";
+import { isUnknownTicker } from "../coingecko.js";
+import { addWatchlistEntry, getWatchlist } from "../storage.js";
+import { inlineButton, inlineKeyboard } from "../toolkit/index.js";
 
-// SCAFFOLD — generated from the bot blueprint BEFORE the agent runs.
-// Keep a LIVE registration (.command / .callbackQuery / …) so this feature is
-// never an empty stub. Replace the reply body with real logic + copy; if you
-// change the user-facing text, update tests/specs to match EXACTLY.
-// Do NOT rewrite src/bot.ts — buildBot() already auto-loads this module.
-// Menu: wire this into /start via registerMainMenuItem({ label: "Add coin", data: "add_coin" }) if the toolkit exposes it.
+const composer = new Composer<Ctx>();
 
-const composer = new Composer();
-
-composer.callbackQuery("add_coin", async (ctx) => {
+composer.callbackQuery("watchlist:add", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply("Add a coin to your watchlist");
+  ctx.session.step = "awaiting_ticker";
+  await ctx.editMessageText(
+    "Which coin do you want to watch? Type the ticker (e.g. BTC, ETH, TON).",
+    { reply_markup: inlineKeyboard([[inlineButton("Cancel", "menu:main")]]) },
+  );
+});
+
+composer.on("message:text", async (ctx, next) => {
+  if (ctx.session.step !== "awaiting_ticker") return next();
+
+  const ticker = ctx.message.text.trim().toUpperCase().split(/\s+/)[0]!;
+  const userId = ctx.from?.id;
+  if (!userId) return;
+
+  if (isUnknownTicker(ticker)) {
+    await ctx.reply(
+      "Unknown ticker. Try a common one like BTC, ETH, TON, or type any ticker to watch it.",
+      { reply_markup: inlineKeyboard([[inlineButton("⬅️ Back to menu", "menu:main")]]) },
+    );
+    ctx.session.step = "idle";
+    return;
+  }
+
+  const existing = await getWatchlist(userId);
+  if (existing.find((e) => e.ticker === ticker)) {
+    ctx.session.step = "idle";
+    await ctx.reply(`${ticker} is already in your watchlist.`, {
+      reply_markup: inlineKeyboard([
+        [inlineButton("👁 View watchlist", "watchlist:show")],
+        [inlineButton("⬅️ Back to menu", "menu:main")],
+      ]),
+    });
+    return;
+  }
+
+  await addWatchlistEntry(userId, { ticker });
+  ctx.session.step = "idle";
+  await ctx.reply(`✅ Added ${ticker} to your watchlist.`, {
+    reply_markup: inlineKeyboard([
+      [inlineButton("👁 View watchlist", "watchlist:show")],
+      [inlineButton("⬅️ Back to menu", "menu:main")],
+    ]),
+  });
 });
 
 export default composer;

@@ -1,19 +1,17 @@
 [
   {
-    "name": "/settings",
+    "name": "/settings shows defaults",
     "steps": [
       {
+        "send": { "text": "/settings" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "View and edit settings"
+              "text": "⚙️ Your settings:\n\nQuiet hours: not set\nMorning summary: not set\nCooldown: 60 min"
             }
           }
-        ],
-        "send": {
-          "text": "/settings"
-        }
+        ]
       }
     ]
   }

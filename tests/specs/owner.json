@@ -1,19 +1,17 @@
 [
   {
-    "name": "/owner",
+    "name": "/owner shows dashboard",
     "steps": [
       {
+        "send": { "text": "/owner" },
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Owner-only: user count and top alerting coins"
+              "text": "📊 Owner dashboard:\n\nTotal users: 0\n\nNo alerts fired yet."
             }
           }
-        ],
-        "send": {
-          "text": "/owner"
-        }
+        ]
       }
     ]
   }
